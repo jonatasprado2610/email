@@ -3,9 +3,13 @@ import { Router } from 'express';
 import nodemailer from 'nodemailer';
 const server = Router();
 
+const numeroAleatorio = Math.floor(Math.random() * 900000) + 100000;
+const numeroAleatorioString = numeroAleatorio.toString();
 
 
 
+
+  
 const transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -18,14 +22,16 @@ const transport = nodemailer.createTransport({
 });
 
 server.post('/enviar/email', (req, resp) => {
-    const { email } = req.body;
+    const { email} = req.body;
     try{
+       let codigoGerado = numeroAleatorioString
+    
         transport.sendMail({
             from: 'Jonatas <jonatasprado445@gmail.com>',
             to: email,
             subject: 'testando email com nodemailer',
-            html: '<h1>EU VOU HACKEAR A NASA</h1>',
-            text: 'Ola, sou jonatas2'
+            html: '',
+            text: `Codigo teste ${codigoGerado}`
         })
         resp.send('Email enviado com Sucesso')
 
@@ -34,9 +40,21 @@ server.post('/enviar/email', (req, resp) => {
             erro: err.message
         })
     }
-
-    
-    
 });
+
+// Rota para validar o código inserido pelo usuário
+server.post('/validar/email', (req, resp) => {
+    const { codigoUsuario } = req.body;
+    
+    if (codigoUsuario === numeroAleatorioString) {
+        resp.send('Código válido. Email confirmado.');
+    } else {
+        resp.status(400).send('Código inválido. Email não confirmado.');
+    }
+});
+
+
+
+
 
 export default server;
